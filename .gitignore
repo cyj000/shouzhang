@@ -11,3 +11,10 @@ android/key.properties
 **/*.freezed.dart
 .idea/
 .vscode/
+
+# Flutter 自动生成文件（不应提交）
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-post-cache
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+**/GeneratedPluginRegistrant.java

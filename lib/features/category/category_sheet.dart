@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/injection.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/models/records.dart';
 import '../../domain/entities/constants.dart';
 import '../../domain/usecases/amount_parser.dart';
 import '../../telemetry/events.dart';

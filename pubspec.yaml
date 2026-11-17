@@ -11,8 +11,10 @@ dependencies:
     sdk: flutter
 
   # --- 本地数据库 ORM + SQLCipher 加密（PKG-02） ---
+  # 注意：不引入 drift_flutter —— 它传递依赖 sqlite3_flutter_libs，
+  # 与 sqlcipher_flutter_libs 打包同名 BuildConfig 导致 dex 合并冲突。
+  # 本项目直接用 drift/native.dart + sqlcipher_flutter_libs 打开加密库。
   drift: ^2.22.0
-  drift_flutter: ^0.2.1
   sqlcipher_flutter_libs: ^0.6.8
   path_provider: ^2.1.4
   path: ^1.9.0

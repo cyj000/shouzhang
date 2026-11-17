@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 
+import '../../data/models/records.dart';
 import '../../data/repository/app_repositories.dart';
 import '../../domain/entities/constants.dart';
 import '../../security/cipher.dart';
