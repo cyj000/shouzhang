@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "keywords": [
+    { "word": "咖啡", "tag": "餐饮", "type": "品类", "confidence": 0.92 },
+    { "word": "奶茶", "tag": "餐饮", "type": "品类", "confidence": 0.90 },
+    { "word": "早餐", "tag": "餐饮", "type": "品类", "confidence": 0.90 },
+    { "word": "午餐", "tag": "餐饮", "type": "品类", "confidence": 0.90 },
+    { "word": "晚餐", "tag": "餐饮", "type": "品类", "confidence": 0.90 },
+    { "word": "外卖", "tag": "餐饮", "type": "品类", "confidence": 0.88 },
+    { "word": "地铁", "tag": "交通", "type": "品类", "confidence": 0.92 },
+    { "word": "公交", "tag": "交通", "type": "品类", "confidence": 0.92 },
+    { "word": "打车", "tag": "交通", "type": "品类", "confidence": 0.90 },
+    { "word": "加油", "tag": "交通", "type": "品类", "confidence": 0.88 },
+    { "word": "超市", "tag": "日用", "type": "品类", "confidence": 0.85 },
+    { "word": "纸巾", "tag": "日用", "type": "品类", "confidence": 0.82 },
+    { "word": "电影", "tag": "娱乐", "type": "品类", "confidence": 0.90 },
+    { "word": "游戏", "tag": "娱乐", "type": "品类", "confidence": 0.88 },
+    { "word": "书", "tag": "学习", "type": "品类", "confidence": 0.80 },
+    { "word": "课程", "tag": "学习", "type": "品类", "confidence": 0.86 },
+    { "word": "房租", "tag": "居住", "type": "品类", "confidence": 0.95 },
+    { "word": "水电", "tag": "居住", "type": "品类", "confidence": 0.90 },
+    { "word": "工资", "tag": "收入", "type": "品类", "confidence": 0.95 },
+    { "word": "奖金", "tag": "收入", "type": "品类", "confidence": 0.92 },
+    { "word": "星巴克", "tag": "星巴克", "type": "品牌", "confidence": 0.95 },
+    { "word": "瑞幸", "tag": "瑞幸", "type": "品牌", "confidence": 0.95 },
+    { "word": "微信支付", "tag": "微信", "type": "支付", "confidence": 0.90 },
+    { "word": "支付宝", "tag": "支付宝", "type": "支付", "confidence": 0.90 }
+  ]
+}

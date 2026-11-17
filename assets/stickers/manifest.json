@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "note": "一期内置贴纸随包打包；本目录素材为程序化矢量绘制标识（builtin://），自绘即 CC0，不引入来源不明二进制。导入外部素材必须走 LicenseGuard 并在 docs/license_audit.md 留痕。",
+  "items": [
+    { "id": "builtin_coffee", "asset_path": "builtin://coffee", "license": "CC0", "attributes": ["餐饮", "咖啡"] },
+    { "id": "builtin_food", "asset_path": "builtin://food", "license": "CC0", "attributes": ["餐饮"] },
+    { "id": "builtin_bus", "asset_path": "builtin://bus", "license": "CC0", "attributes": ["交通"] },
+    { "id": "builtin_book", "asset_path": "builtin://book", "license": "CC0", "attributes": ["学习"] },
+    { "id": "builtin_gift", "asset_path": "builtin://gift", "license": "CC0", "attributes": ["人情"] },
+    { "id": "builtin_home", "asset_path": "builtin://home", "license": "CC0", "attributes": ["居住"] }
+  ]
+}

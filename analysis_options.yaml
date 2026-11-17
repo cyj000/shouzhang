@@ -1,0 +1,18 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "build/**"
+  errors:
+    # 生成代码尚未纳入版本库时避免误报，业务代码仍受 flutter_lints 约束
+    todo: ignore
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_final_fields: true
+    avoid_print: true
+    sort_child_properties_last: true
+    use_build_context_synchronously: true
