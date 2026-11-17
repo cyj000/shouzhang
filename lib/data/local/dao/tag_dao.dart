@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../domain/entities/constants.dart';
+import '../../../domain/entities/constants.dart';
 import '../../models/records.dart';
 import '../database.dart';
 import 'base_dao.dart';
@@ -11,8 +11,10 @@ class TagDao extends BaseDao {
   TagDao(super.db);
 
   Future<TagRow?> findByName(String name) async {
-    final rows = await (db.select(db.tags)..where((t) => t.name.equals(name)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, name, type, is_system FROM tags WHERE name = ?',
+      variables: <Variable<Object>>[Variable<String>(name)],
+    ).get();
     return rows.isEmpty ? null : TagRow.fromRow(rows.first);
   }
 
@@ -33,17 +35,17 @@ class TagDao extends BaseDao {
   }
 
   Future<List<TagRow>> allTags() async {
-    final rows = await (db.select(db.tags)
-          ..orderBy(<OrderingTerm Function(Tags)>[
-            (t) => OrderingTerm.asc(t.name),
-          ]))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, name, type, is_system FROM tags ORDER BY name ASC',
+    ).get();
     return rows.map(TagRow.fromRow).toList();
   }
 
   Future<TagRow?> findById(String id) async {
-    final rows = await (db.select(db.tags)..where((t) => t.id.equals(id)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, name, type, is_system FROM tags WHERE id = ?',
+      variables: <Variable<Object>>[Variable<String>(id)],
+    ).get();
     return rows.isEmpty ? null : TagRow.fromRow(rows.first);
   }
 
@@ -83,9 +85,11 @@ class TagDao extends BaseDao {
   }
 
   Future<List<EntryTagRow>> relationsForEntry(String entryId) async {
-    final rows = await (db.select(db.entryTags)
-          ..where((t) => t.entryId.equals(entryId)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT entry_id, tag_id, source, confidence, sticker_instance_id '
+      'FROM entry_tags WHERE entry_id = ?',
+      variables: <Variable<Object>>[Variable<String>(entryId)],
+    ).get();
     return rows.map(EntryTagRow.fromRow).toList();
   }
 
@@ -112,7 +116,7 @@ class TagDao extends BaseDao {
           WHERE et.entry_id = ?
           ORDER BY et.confidence DESC, t.name ASC
           ''',
-          variables: <Variable<Object?>>[Variable<String>(entryId)],
+          variables: <Variable<Object>>[Variable<String>(entryId)],
         )
         .get();
     return rows.map(TagRow.fromRow).toList();

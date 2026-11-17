@@ -73,7 +73,7 @@ abstract final class AppTheme {
           fontFamily: handFontFamily,
         ),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: surface,
         elevation: 1,
         margin: const EdgeInsets.symmetric(

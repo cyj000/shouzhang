@@ -19,9 +19,10 @@ class InkDao extends BaseDao {
   }
 
   Future<List<InkLayerRow>> layersForEntry(String entryId) async {
-    final rows = await (db.select(db.inkLayers)
-          ..where((t) => t.entryId.equals(entryId)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, entry_id, strokes_json FROM ink_layers WHERE entry_id = ?',
+      variables: <Variable<Object>>[Variable<String>(entryId)],
+    ).get();
     return rows.map(InkLayerRow.fromRow).toList();
   }
 

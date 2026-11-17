@@ -36,9 +36,10 @@ void main() {
   });
 
   test('系统标签 未分类 已种子化且不可删口径存在', () async {
-    final rows = await (db.select(db.tags)
-          ..where((t) => t.name.equals(SystemTags.unclassifiedName)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, name, type, is_system FROM tags WHERE name = ?',
+      variables: <Variable<Object>>[Variable<String>(SystemTags.unclassifiedName)],
+    ).get();
     expect(rows.length, 1);
     expect(TagRow.fromRow(rows.first).isSystem, isTrue);
   });
@@ -64,9 +65,9 @@ void main() {
       <Object?>['e2', 'expense', 10, now, 0, 1, 0, 0, 0, 0, 0, now, now],
     );
 
-    final active = await (db.select(db.entries)
-          ..where((t) => t.deleted.equals(false)))
-        .get();
+    final active = await db.customSelect(
+      'SELECT id FROM entries WHERE deleted = 0',
+    ).get();
     expect(active.length, 1);
     expect(active.first.read<String>('id'), 'e1');
   });
@@ -113,9 +114,10 @@ void main() {
       <Object?>[10, now, entry.id],
     );
 
-    final rows = await (db.select(db.entries)
-          ..where((t) => t.id.equals(entry.id)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT * FROM entries WHERE id = ?',
+      variables: <Variable<Object>>[Variable<String>(entry.id)],
+    ).get();
     final updated = EntryRow.fromRow(rows.first);
     expect(updated.amountCents, isA<int>());
     expect(updated.amountCents, 10);

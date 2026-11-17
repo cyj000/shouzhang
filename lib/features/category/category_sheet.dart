@@ -57,7 +57,7 @@ class _UnclassifiedSheetState extends ConsumerState<UnclassifiedSheet> {
     final repos = await ref.read(appRepositoriesProvider.future);
     final tagId = await repos.tags.ensureTag(tagName);
     for (final entryId in _selected) {
-      await repos.tags.addEntryTag(
+      await repos.tags.addTagToEntry(
         EntryTagRow(
           entryId: entryId,
           tagId: tagId,

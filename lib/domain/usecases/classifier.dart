@@ -104,9 +104,10 @@ class UserKeywordStore {
 class Classifier {
   const Classifier(
     this._library, {
-    this._userWords = const <String, String>{},
-    this._demoted = const <String>{},
-  });
+    Map<String, String> userWords = const <String, String>{},
+    Set<String> demoted = const <String>{},
+  })  : _userWords = userWords,
+        _demoted = demoted;
 
   final KeywordLibrary _library;
   final Map<String, String> _userWords;

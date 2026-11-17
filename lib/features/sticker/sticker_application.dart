@@ -52,7 +52,7 @@ class StickerApplication {
     var merged = 0;
     for (final attribute in sticker.attributes) {
       final tagId = await _repos.tags.ensureTag(attribute);
-      await _repos.tags.addEntryTag(
+      await _repos.tags.addTagToEntry(
         EntryTagRow(
           entryId: entryId,
           tagId: tagId,

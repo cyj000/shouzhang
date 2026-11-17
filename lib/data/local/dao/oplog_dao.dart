@@ -24,11 +24,10 @@ class OplogDao extends BaseDao {
   }
 
   Future<List<OplogRow>> all() async {
-    final rows = await (db.select(db.oplog)
-          ..orderBy(<OrderingTerm Function(Oplog)>[
-            (t) => OrderingTerm.asc(t.lamport),
-          ]))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT op_id, device_id, entity, op_type, payload_json, lamport, created_at '
+      'FROM oplog ORDER BY lamport ASC',
+    ).get();
     return rows.map(OplogRow.fromRow).toList();
   }
 }

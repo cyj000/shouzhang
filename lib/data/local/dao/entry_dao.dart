@@ -50,30 +50,30 @@ class EntryDao extends BaseDao {
   }
 
   Future<EntryRow?> findById(String id) async {
-    final rows = await (db.select(db.entries)
-          ..where((t) => t.id.equals(id)))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT $_columns FROM entries WHERE id = ?',
+      variables: <Variable<Object>>[Variable<String>(id)],
+    ).get();
     return rows.isEmpty ? null : EntryRow.fromRow(rows.first);
   }
 
   /// 软删过滤：所有常规查询必须带 deleted = 0（§3.10 / REV-05）。
   Stream<List<EntryRow>> watchActive() {
-    return (db.select(db.entries)
-          ..where((t) => t.deleted.equals(false))
-          ..orderBy(<OrderingTerm Function(Entries)>[
-            (t) => OrderingTerm.desc(t.occurredAt),
-          ]))
-        .watch()
-        .map((rows) => rows.map(EntryRow.fromRow).toList());
+    return db.customSelect(
+      'SELECT $_columns FROM entries WHERE deleted = 0 ORDER BY occurred_at DESC',
+    ).watch().map((rows) => rows.map(EntryRow.fromRow).toList());
   }
 
   Future<List<EntryRow>> activeInRange(int fromMs, int toMs) async {
-    final rows = await (db.select(db.entries)
-          ..where((t) => t.deleted.equals(false) & t.occurredAt.isBetweenValues(fromMs, toMs))
-          ..orderBy(<OrderingTerm Function(Entries)>[
-            (t) => OrderingTerm.desc(t.occurredAt),
-          ]))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT $_columns FROM entries '
+      'WHERE deleted = 0 AND occurred_at BETWEEN ? AND ? '
+      'ORDER BY occurred_at DESC',
+      variables: <Variable<Object>>[
+        Variable<int>(fromMs),
+        Variable<int>(toMs),
+      ],
+    ).get();
     return rows.map(EntryRow.fromRow).toList();
   }
 
@@ -88,7 +88,7 @@ class EntryDao extends BaseDao {
   Future<int> purgeTombstones(int cutoffMs) async {
     final countRow = await db.customSelect(
       'SELECT COUNT(*) AS c FROM entries WHERE deleted=1 AND updated_at < ?',
-      variables: <Variable<Object?>>[Variable<int>(cutoffMs)],
+      variables: <Variable<Object>>[Variable<int>(cutoffMs)],
     ).getSingle();
     final count = countRow.read<int>('c');
     if (count > 0) {

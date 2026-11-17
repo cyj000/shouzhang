@@ -41,7 +41,7 @@
 ## 3. 关键决策记录
 
 - **状态管理**：选 Riverpod。理由： Provider 声明式注入、易与 Repository/Usecase 分层、测试可直接覆盖 provider。
-- **数据库**：采用 drift 的 **Dart-only 表定义**（不引入 build_runner 生成文件），保证工程在无生成步骤时也可分析通过。
+- **数据库**：采用 drift 的 **Dart-only 表定义**（不引入 build_runner 生成文件），保证工程在无生成步骤时也可分析通过。表声明（`extends Table`）仅作 schema 文档；运行时不走 `select()`/`createAll()`（因其需代码生成的 `TableInfo`），改为在 `database.dart` 中显式 SQL 建表，所有 DAO 用 `customSelect`/`customStatement` 访问并返回 `QueryRow`。
 - **加密**：SQLCipher AES-256；密钥链路 DQ-01（Keystore 生成主密钥 → 加密随机 passphrase → 密文落私有目录 → passphrase 开库），见 PKG-02。
 - **金额**：全链路 int 分，展示层格式化两位小数；禁止 double/float 参与金额运算。
 - **权限**：release Manifest 无 INTERNET / 定位 / 录音；INTERNET 仅 debug 热重载使用。相册/相机在 PKG-07 按需申请。

@@ -54,7 +54,7 @@ class EntryRow {
   final int createdAt;
   final int updatedAt;
 
-  factory EntryRow.fromRow(Row row) => EntryRow(
+  factory EntryRow.fromRow(QueryRow row) => EntryRow(
         id: row.read<String>('id'),
         type: row.read<String>('type'),
         amountCents: row.read<int>('amount_cents'),
@@ -94,7 +94,7 @@ class TagRow {
   final String? type;
   final bool isSystem;
 
-  factory TagRow.fromRow(Row row) => TagRow(
+  factory TagRow.fromRow(QueryRow row) => TagRow(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         type: row.read<String?>('type'),
@@ -117,7 +117,7 @@ class EntryTagRow {
   final double confidence;
   final String? stickerInstanceId;
 
-  factory EntryTagRow.fromRow(Row row) => EntryTagRow(
+  factory EntryTagRow.fromRow(QueryRow row) => EntryTagRow(
         entryId: row.read<String>('entry_id'),
         tagId: row.read<String>('tag_id'),
         source: row.read<String>('source'),
@@ -145,7 +145,7 @@ class StickerRow {
   final int? removedAt;
   final String? removeReason;
 
-  factory StickerRow.fromRow(Row row) => StickerRow(
+  factory StickerRow.fromRow(QueryRow row) => StickerRow(
         id: row.read<String>('id'),
         assetPath: row.read<String>('asset_path'),
         attributesJson: row.read<String>('attributes_json'),
@@ -173,7 +173,7 @@ class StickerSourceRow {
   final String? author;
   final String licenseCheckShot;
 
-  factory StickerSourceRow.fromRow(Row row) => StickerSourceRow(
+  factory StickerSourceRow.fromRow(QueryRow row) => StickerSourceRow(
         stickerId: row.read<String>('sticker_id'),
         sourceUrl: row.read<String>('source_url'),
         license: row.read<String>('license'),
@@ -202,7 +202,7 @@ class StickerInstanceRow {
   final String transformJson;
   final int zOrder;
 
-  factory StickerInstanceRow.fromRow(Row row) => StickerInstanceRow(
+  factory StickerInstanceRow.fromRow(QueryRow row) => StickerInstanceRow(
         id: row.read<String>('id'),
         entryId: row.read<String>('entry_id'),
         stickerId: row.read<String>('sticker_id'),
@@ -225,7 +225,7 @@ class InkLayerRow {
   final String entryId;
   final String strokesJson; // 增量笔迹指令数组
 
-  factory InkLayerRow.fromRow(Row row) => InkLayerRow(
+  factory InkLayerRow.fromRow(QueryRow row) => InkLayerRow(
         id: row.read<String>('id'),
         entryId: row.read<String>('entry_id'),
         strokesJson: row.read<String>('strokes_json'),
@@ -251,7 +251,7 @@ class OplogRow {
   final int lamport;
   final int createdAt;
 
-  factory OplogRow.fromRow(Row row) => OplogRow(
+  factory OplogRow.fromRow(QueryRow row) => OplogRow(
         opId: row.read<String>('op_id'),
         deviceId: row.read<String>('device_id'),
         entity: row.read<String>('entity'),
@@ -275,7 +275,7 @@ class TelemetryEventRow {
   final String payloadJson;
   final int ts;
 
-  factory TelemetryEventRow.fromRow(Row row) => TelemetryEventRow(
+  factory TelemetryEventRow.fromRow(QueryRow row) => TelemetryEventRow(
         id: row.read<int>('id'),
         eventName: row.read<String>('event_name'),
         payloadJson: row.read<String>('payload_json'),

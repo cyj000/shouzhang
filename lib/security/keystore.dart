@@ -48,4 +48,10 @@ abstract final class KeystoreService {
 
   static Future<void> clearAuthTimestamp() =>
       _storage.delete(key: _authTsKey);
+
+  /// 通用加密 KV 读写：供 PKG-07 开关等非时间戳类小数据复用。
+  static Future<String?> readEncrypted(String key) => _storage.read(key: key);
+
+  static Future<void> writeEncrypted(String key, String value) =>
+      _storage.write(key: key, value: value);
 }

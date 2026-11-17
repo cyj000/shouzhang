@@ -22,12 +22,11 @@ class TelemetryDao extends BaseDao {
   }
 
   Future<List<TelemetryEventRow>> eventsByName(String eventName) async {
-    final rows = await (db.select(db.telemetryEvents)
-          ..where((t) => t.eventName.equals(eventName))
-          ..orderBy(<OrderingTerm Function(TelemetryEvents)>[
-            (t) => OrderingTerm.asc(t.ts),
-          ]))
-        .get();
+    final rows = await db.customSelect(
+      'SELECT id, event_name, payload_json, ts FROM telemetry_events '
+      'WHERE event_name = ? ORDER BY ts ASC',
+      variables: <Variable<Object>>[Variable<String>(eventName)],
+    ).get();
     return rows.map(TelemetryEventRow.fromRow).toList();
   }
 }
