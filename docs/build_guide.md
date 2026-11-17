@@ -26,7 +26,7 @@
 | 用途 | 依赖 | 锁定约束 |
 | --- | --- | --- |
 | ORM | `drift` / `drift_flutter` | `^2.22.0` / `^0.2.1` |
-| 加密 | `sqlcipher_flutter_libs` | `^0.7.0` |
+| 加密 | `sqlcipher_flutter_libs` | `^0.6.8`（0.7.0+eol 要求 Dart ≥3.10，与锁定的 Dart 3.5 冲突，故回退到兼容 3.5 的最后版本） |
 | 密钥/认证 | `flutter_secure_storage` / `local_auth` | `^9.2.2` / `^2.3.0` |
 | 状态管理（**选型已锁定**） | `flutter_riverpod` | `^2.6.1` |
 | 路由 | `go_router` | `^14.8.1` |
