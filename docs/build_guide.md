@@ -34,6 +34,7 @@
 | 金额解析 | 自写 `amount_parser`（int 分单位，禁 double） | — |
 | CSV | `csv` | `^6.0.0` |
 | 测试 | `flutter_test` + drift 内存库 | SDK 内置 |
+| 代码生成 | `build_runner` | `^2.4.13`（2.4.14+ 要求 Dart ≥3.6，与锁定的 Dart 3.5 冲突，故回退） |
 
 > 说明：本环境无法访问 pub.dev 校验最新补丁版本；上述为已知稳定约束，首次构建时以 `flutter pub get` 实际解析结果为准并记录 `pubspec.lock`。锁定后不得改约束。
 
