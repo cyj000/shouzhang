@@ -39,8 +39,8 @@ class TombstoneCleanup {
       taskName,
       taskName,
       frequency: const Duration(days: 1),
-      constraints: const Constraints(
-        networkType: NetworkType.notRequired,
+      constraints: Constraints(
+        networkType: NetworkType.not_required,
         requiresDeviceIdle: true,
       ),
       existingWorkPolicy: ExistingWorkPolicy.keep,
