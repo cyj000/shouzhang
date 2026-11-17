@@ -86,7 +86,7 @@ class _StickerPickerSheetState extends ConsumerState<StickerPickerSheet> {
                   ),
                   for (final instance in _instances)
                     ListTile(
-                      leading: const Icon(Icons.sticker),
+                      leading: const Icon(Icons.image),
                       title: Text(instance.assetPathSnapshot),
                       subtitle: Text(
                         jsonDecode(instance.attributesSnapshotJson).join(' · '),
