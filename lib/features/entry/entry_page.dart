@@ -90,7 +90,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
                           entryId: state.lastSavedEntryId!,
                         ),
                       ),
-                      icon: const Icon(Icons.sticker),
+                      icon: const Icon(Icons.image),
                       label: const Text('贴纸'),
                     ),
                     OutlinedButton.icon(
