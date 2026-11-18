@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_typography.dart';
 
 /// 自绘金额键盘（DQ-03 / SP-03 对比用）。默认关闭，系统键盘为 DQ-02 默认方案。
 class CustomAmountKeypad extends StatelessWidget {
@@ -41,7 +43,7 @@ class CustomAmountKeypad extends StatelessWidget {
                               ? AppTheme.inkSoft
                               : Theme.of(context).colorScheme.surfaceContainerHighest,
                           foregroundColor: key == '⌫' || key == '.'
-                              ? Colors.white
+                              ? AppColors.onPrimary
                               : AppTheme.ink,
                           minimumSize: const Size(0, 48),
                           shape: RoundedRectangleBorder(
@@ -55,7 +57,13 @@ class CustomAmountKeypad extends StatelessWidget {
                             onToken(key);
                           }
                         },
-                        child: Text(key, style: const TextStyle(fontSize: 20)),
+                        child: Text(
+                          key,
+                          style: const TextStyle(
+                            fontFamily: AppTypography.bodyFamily,
+                            fontSize: AppTypography.sizeKeycap,
+                          ),
+                        ),
                       ),
                     ),
                   ),

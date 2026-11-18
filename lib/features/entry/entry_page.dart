@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/injection.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_typography.dart';
 import '../../domain/entities/constants.dart';
 import '../../domain/usecases/amount_parser.dart';
 import '../ink/ink_editor_page.dart';
 import '../sticker/sticker_picker_sheet.dart';
 import 'entry_controller.dart';
+import 'entry_styles.dart';
 import 'widgets/custom_keypad.dart' as keypad_widget;
 
 /// 极速记账页（FR-01~06）。冷启动直落此页，金额框优先聚焦（DQ-02）。
@@ -153,7 +156,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('记一笔', style: TextStyle(fontSize: 18)),
+                        : const Text('记一笔', style: EntryStyles.saveButtonLabel),
                   ),
                 ),
               ),
@@ -221,15 +224,12 @@ class _EntryPageState extends ConsumerState<EntryPage> {
             vertical: AppTheme.spaceS,
           ),
           decoration: BoxDecoration(
-            color: selected ? color : Colors.transparent,
+            color: selected ? color : AppColors.transparent,
             borderRadius: BorderRadius.circular(AppTheme.radiusL),
           ),
           child: Text(
             label,
-            style: TextStyle(
-              color: selected ? Colors.white : AppTheme.inkSoft,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            ),
+            style: EntryStyles.typeChipLabel(selected),
           ),
         ),
       );
@@ -246,11 +246,11 @@ class _EntryPageState extends ConsumerState<EntryPage> {
             autofocus: true,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.done,
-            style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w600),
+            style: EntryStyles.amountInput,
             decoration: const InputDecoration(
               hintText: '0.00',
               prefixText: '¥ ',
-              prefixStyle: TextStyle(fontSize: 28),
+              prefixStyle: AppTypography.amountPrefixStyle,
             ),
             onChanged: (value) =>
                 ref.read(entryControllerProvider.notifier).updateExpression(value),
@@ -258,10 +258,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
           const SizedBox(height: AppTheme.spaceXS),
           Text(
             preview == null ? '支持 25+8、10÷3 等算式' : '= ${formatYuan(preview)} 元',
-            style: TextStyle(
-              color: preview == null ? AppTheme.inkSoft : AppTheme.accent,
-              fontSize: 16,
-            ),
+            style: EntryStyles.preview(hasValue: preview != null),
           ),
         ],
       ),

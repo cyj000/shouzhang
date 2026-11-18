@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/injection.dart';
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_typography.dart';
 import '../../data/models/records.dart';
+import '../../shared/decor/empty_state_art.dart';
+import '../../shared/decor/sticker_frame.dart';
+import '../../shared/decor/tape_strip.dart';
 import 'sticker_application.dart';
 import 'sticker_catalog.dart';
 
@@ -67,22 +72,42 @@ class _StickerPickerSheetState extends ConsumerState<StickerPickerSheet> {
               child: ListView(
                 controller: scrollController,
                 children: <Widget>[
-                  Wrap(
-                    spacing: AppTheme.spaceM,
-                    runSpacing: AppTheme.spaceM,
-                    children: filtered
-                        .map(
-                          (sticker) => _StickerTile(
-                            sticker: sticker,
-                            onTap: () => _apply(sticker),
-                          ),
-                        )
-                        .toList(),
-                  ),
+                  if (filtered.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: AppTheme.spaceXL),
+                      child: EmptyStateArt(
+                        title: '没找到这类贴纸',
+                        hint: '换个关键词试试，或浏览全部生活贴纸',
+                        icon: Icons.search_off_outlined,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: AppTheme.spaceM,
+                      runSpacing: AppTheme.spaceM,
+                      children: filtered
+                          .map(
+                            (sticker) => _StickerTile(
+                              sticker: sticker,
+                              onTap: () => _apply(sticker),
+                            ),
+                          )
+                          .toList(),
+                    ),
                   const Divider(height: AppTheme.spaceXL),
-                  Text(
-                    '本笔已贴（点按撤销）',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  Row(
+                    children: <Widget>[
+                      const TapeStrip(
+                        width: 28,
+                        height: 14,
+                        tilt: -AppShape.tapeTilt,
+                      ),
+                      const SizedBox(width: AppTheme.spaceXS),
+                      Text(
+                        '本笔已贴（点按撤销）',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
                   ),
                   for (final instance in _instances)
                     ListTile(
@@ -137,16 +162,19 @@ class _StickerTile extends StatelessWidget {
           width: 88,
           child: Column(
             children: <Widget>[
-              Container(
-                padding: const EdgeInsets.all(AppTheme.spaceM),
-                decoration: BoxDecoration(
-                  color: sticker.color.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusM),
-                ),
+              StickerFrame(
+                tint: sticker.color,
                 child: Icon(sticker.icon, size: 36, color: sticker.color),
               ),
               const SizedBox(height: AppTheme.spaceXS),
-              Text(sticker.label, style: const TextStyle(fontSize: 13)),
+              Text(
+                sticker.label,
+                style: TextStyle(
+                  fontFamily: AppTypography.bodyFamily,
+                  fontSize: AppTypography.sizeCaption + 2,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             ],
           ),
         ),

@@ -1,12 +1,30 @@
 {
-  "schema_version": 1,
-  "note": "一期内置贴纸随包打包；本目录素材为程序化矢量绘制标识（builtin://），自绘即 CC0，不引入来源不明二进制。导入外部素材必须走 LicenseGuard 并在 docs/license_audit.md 留痕。",
+  "schema_version": 2,
+  "note": "一期内置贴纸随包打包；本目录素材为程序化矢量绘制标识（builtin://），自绘即 CC0，不引入来源不明二进制。导入外部素材必须走 LicenseGuard 并在 docs/license_audit.md 留痕。视觉专项 VPKG-03 扩充至 24 款生活物件贴纸，全部自绘 CC0。",
   "items": [
     { "id": "builtin_coffee", "asset_path": "builtin://coffee", "license": "CC0", "attributes": ["餐饮", "咖啡"] },
     { "id": "builtin_food", "asset_path": "builtin://food", "license": "CC0", "attributes": ["餐饮"] },
+    { "id": "builtin_cake", "asset_path": "builtin://cake", "license": "CC0", "attributes": ["餐饮", "甜点"] },
+    { "id": "builtin_tea", "asset_path": "builtin://tea", "license": "CC0", "attributes": ["餐饮", "饮品"] },
+    { "id": "builtin_fruit", "asset_path": "builtin://fruit", "license": "CC0", "attributes": ["餐饮", "健康"] },
+    { "id": "builtin_bread", "asset_path": "builtin://bread", "license": "CC0", "attributes": ["餐饮", "早餐"] },
     { "id": "builtin_bus", "asset_path": "builtin://bus", "license": "CC0", "attributes": ["交通"] },
+    { "id": "builtin_train", "asset_path": "builtin://train", "license": "CC0", "attributes": ["交通", "长途"] },
+    { "id": "builtin_plane", "asset_path": "builtin://plane", "license": "CC0", "attributes": ["交通", "旅行"] },
+    { "id": "builtin_bike", "asset_path": "builtin://bike", "license": "CC0", "attributes": ["交通", "运动"] },
+    { "id": "builtin_taxi", "asset_path": "builtin://taxi", "license": "CC0", "attributes": ["交通"] },
+    { "id": "builtin_home", "asset_path": "builtin://home", "license": "CC0", "attributes": ["居住"] },
+    { "id": "builtin_pet", "asset_path": "builtin://pet", "license": "CC0", "attributes": ["生活", "宠物"] },
+    { "id": "builtin_plant", "asset_path": "builtin://plant", "license": "CC0", "attributes": ["生活", "居家"] },
+    { "id": "builtin_clean", "asset_path": "builtin://clean", "license": "CC0", "attributes": ["生活", "家务"] },
+    { "id": "builtin_light", "asset_path": "builtin://light", "license": "CC0", "attributes": ["居住", "缴费"] },
     { "id": "builtin_book", "asset_path": "builtin://book", "license": "CC0", "attributes": ["学习"] },
+    { "id": "builtin_school", "asset_path": "builtin://school", "license": "CC0", "attributes": ["学习", "教育"] },
+    { "id": "builtin_work", "asset_path": "builtin://work", "license": "CC0", "attributes": ["工作"] },
     { "id": "builtin_gift", "asset_path": "builtin://gift", "license": "CC0", "attributes": ["人情"] },
-    { "id": "builtin_home", "asset_path": "builtin://home", "license": "CC0", "attributes": ["居住"] }
+    { "id": "builtin_movie", "asset_path": "builtin://movie", "license": "CC0", "attributes": ["娱乐"] },
+    { "id": "builtin_music", "asset_path": "builtin://music", "license": "CC0", "attributes": ["娱乐"] },
+    { "id": "builtin_health", "asset_path": "builtin://health", "license": "CC0", "attributes": ["医疗", "健康"] },
+    { "id": "builtin_sport", "asset_path": "builtin://sport", "license": "CC0", "attributes": ["运动", "健康"] }
   ]
 }

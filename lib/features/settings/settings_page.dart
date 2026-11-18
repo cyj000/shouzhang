@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/auth_providers.dart';
 import '../../core/di/injection.dart';
+import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_typography.dart';
 import '../../domain/entities/constants.dart';
 import '../sticker/tombstone_cleanup.dart';
 
@@ -122,6 +124,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             value: _customKeypad,
             onChanged: _toggleKeypad,
           ),
+          Consumer(
+            builder: (context, ref, _) => SwitchListTile(
+              secondary: const Icon(Icons.animation_outlined),
+              title: const Text('界面动效'),
+              subtitle: const Text('关闭后贴纸/装饰动效即时到位，全功能可用'),
+              value: ref.watch(motionEnabledProvider),
+              onChanged: (value) =>
+                  ref.read(motionEnabledProvider.notifier).state = value,
+            ),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.delete_sweep_outlined),
@@ -140,7 +152,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('权限与隐私说明', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  '权限与隐私说明',
+                  style: TextStyle(
+                    fontFamily: AppTypography.bodyFamily,
+                    fontSize: AppTypography.sizeBody,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 SizedBox(height: AppTheme.spaceS),
                 Text('· 账目与埋点仅存储在本地，数据不出设备'),
                 Text('· 不申请定位、录音权限，无语音与自动地点采集'),

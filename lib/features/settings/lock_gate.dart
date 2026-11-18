@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/auth_providers.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 /// 锁屏门控（FR-33）：默认免密直通；开启后冷启动/超时需认证。
 class LockGate extends ConsumerWidget {
@@ -44,14 +46,25 @@ class _LockScreenState extends ConsumerState<_LockScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(Icons.lock_outline, size: 64),
-            const SizedBox(height: 24),
-            const Text('纸间账已上锁'),
-            const SizedBox(height: 16),
+            Icon(
+              Icons.lock_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: AppTheme.spaceL),
+            Text(
+              '纸间账已上锁',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: AppTheme.spaceM),
             if (_error != null)
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                padding: const EdgeInsets.all(AppTheme.spaceS),
+                child: Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.error),
+                ),
               ),
             FilledButton(
               onPressed: _busy ? null : _unlock,

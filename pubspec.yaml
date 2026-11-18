@@ -46,4 +46,16 @@ flutter:
   uses-material-design: true
   assets:
     - assets/stickers/
+    - assets/stickers/manifest.json
+    - assets/fonts/OFL.txt
     - lib/data/local/assets/keywords.json
+  # 视觉专项 VPKG-01：可商用中文手写字体（霞鹜文楷，SIL OFL 1.1）。
+  # 体积约束已解除，完整字库直接打包，不做子集化。授权凭证见 assets/fonts/OFL.txt
+  # 与 docs/visual_asset_licenses.md。字体族名与 AppTypography 保持一致。
+  fonts:
+    - family: LXGWWenKai
+      fonts:
+        - asset: assets/fonts/LXGWWenKai-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/LXGWWenKai-Medium.ttf
+          weight: 500

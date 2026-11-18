@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_typography.dart';
 import '../../data/models/records.dart';
 import '../../domain/usecases/amount_parser.dart';
 import '../../domain/usecases/stats.dart';
+import '../../shared/decor/empty_state_art.dart';
+import '../../shared/decor/tape_strip.dart';
 import 'export_service.dart';
 import 'review_controller.dart';
 
@@ -67,9 +71,19 @@ class _ReviewPageState extends ConsumerState<ReviewPage> {
                 AppTheme.spaceM,
                 AppTheme.spaceS,
               ),
-              child: Text(
-                '多维回顾',
-                style: Theme.of(context).textTheme.headlineSmall,
+              child: Row(
+                children: <Widget>[
+                  const TapeStrip(
+                    width: 30,
+                    height: 14,
+                    tilt: -AppShape.tapeTilt,
+                  ),
+                  const SizedBox(width: AppTheme.spaceS),
+                  Text(
+                    '多维回顾',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ],
               ),
             ),
             _buildFilterChips(state, notifier),
@@ -143,7 +157,11 @@ class _ReviewPageState extends ConsumerState<ReviewPage> {
     if (entries.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(AppTheme.spaceXL),
-        child: Center(child: Text('这段时间还没有账目')),
+        child: EmptyStateArt(
+          title: '这一页还空着',
+          hint: '回到记账页记下第一笔，这里就有了故事',
+          icon: Icons.receipt_long_outlined,
+        ),
       );
     }
 
@@ -176,7 +194,11 @@ class _ReviewPageState extends ConsumerState<ReviewPage> {
     if (bars.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(AppTheme.spaceXL),
-        child: Center(child: Text('该视图暂无数据')),
+        child: EmptyStateArt(
+          title: '这个视角还没有内容',
+          hint: '换个筛选或视图看看，也许会有新发现',
+          icon: Icons.insights_outlined,
+        ),
       );
     }
 
@@ -185,55 +207,69 @@ class _ReviewPageState extends ConsumerState<ReviewPage> {
 
     return Padding(
       padding: const EdgeInsets.all(AppTheme.spaceM),
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spaceM),
-          child: Column(
-            children: <Widget>[
-              for (final bar in bars)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppTheme.spaceXS,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spaceM),
+              child: Column(
+                children: <Widget>[
+                  for (final bar in bars)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.spaceXS,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(bar.$1),
-                          Text(
-                            isCountView
-                                ? '${bar.$3} 次'
-                                : formatYuan(bar.$2),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(bar.$1),
+                              Text(
+                                isCountView
+                                    ? '${bar.$3} 次'
+                                    : formatYuan(bar.$2),
+                                style: const TextStyle(
+                                  fontFamily: AppTypography.bodyFamily,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppTheme.spaceXS),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final ratio = maxCents == 0
+                                  ? 0.0
+                                  : bar.$2 / maxCents;
+                              return Container(
+                                height: AppTheme.spaceMd,
+                                width: constraints.maxWidth * ratio,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.accentCoral,
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusS,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppTheme.spaceXS),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final ratio = maxCents == 0
-                              ? 0.0
-                              : bar.$2 / maxCents;
-                          return Container(
-                            height: 12,
-                            width: constraints.maxWidth * ratio,
-                            decoration: BoxDecoration(
-                              color: AppTheme.accent,
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusS),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
+          const Positioned(
+            top: -8,
+            left: 24,
+            child: TapeStrip(width: 44, height: 16),
+          ),
+        ],
       ),
     );
   }
