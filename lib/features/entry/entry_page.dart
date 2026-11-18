@@ -90,7 +90,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
                           entryId: state.lastSavedEntryId!,
                         ),
                       ),
-                      icon: const Icon(Icons.sticker_outlined),
+                      icon: const Icon(Icons.sticker),
                       label: const Text('贴纸'),
                     ),
                     OutlinedButton.icon(
@@ -305,7 +305,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceM),
       child: DropdownButtonFormField<String>(
-        initialValue: state.paymentMethod,
+        value: state.paymentMethod,
         decoration: const InputDecoration(
           labelText: '支付方式',
           prefixIcon: Icon(Icons.payment_outlined),

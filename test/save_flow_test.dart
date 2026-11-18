@@ -32,7 +32,7 @@ void main() {
     await db.transaction(() async {
       await repos.entries.save(entry);
       final tagId = await repos.tags.ensureTag('餐饮');
-      await repos.tags.addEntryTag(
+      await repos.tags.addTagToEntry(
         EntryTagRow(
           entryId: entry.id,
           tagId: tagId,

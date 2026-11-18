@@ -233,7 +233,7 @@ class EntryController extends Notifier<EntryFormState> {
               suggestion.tagName,
               type: suggestion.source == TagSources.text ? '品类' : null,
             );
-            await repos.tags.addEntryTag(
+            await repos.tags.addTagToEntry(
               EntryTagRow(
                 entryId: entryId,
                 tagId: tagId,
