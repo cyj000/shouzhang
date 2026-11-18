@@ -246,7 +246,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage> {
                                   ? 0.0
                                   : bar.$2 / maxCents;
                               return Container(
-                                height: AppTheme.spaceMd,
+                                height: AppShape.spacingMd,
                                 width: constraints.maxWidth * ratio,
                                 decoration: BoxDecoration(
                                   color: AppTheme.accentCoral,
