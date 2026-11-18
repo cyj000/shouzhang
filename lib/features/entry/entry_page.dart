@@ -90,7 +90,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
                           entryId: state.lastSavedEntryId!,
                         ),
                       ),
-                      icon: const Icon(Icons.image),
+                      icon: const Icon(Icons.sticker_outlined),
                       label: const Text('贴纸'),
                     ),
                     OutlinedButton.icon(
@@ -125,20 +125,35 @@ class _EntryPageState extends ConsumerState<EntryPage> {
                   horizontal: AppTheme.spaceM,
                 ),
                 child: FilledButton(
-                  onPressed: () async {
-                    final ok = await notifier.save();
-                    if (ok && mounted) {
-                      _amountController.clear();
-                      _noteController.clear();
-                      _amountFocus.requestFocus(); // 连续记账停留在记账页
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('已记下，继续下一笔')),
-                      );
-                    }
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppTheme.spaceS),
-                    child: Text('记一笔', style: TextStyle(fontSize: 18)),
+                  // BUGFIX: 保存中禁用按钮，防止连点重复写库。
+                  onPressed: state.isSaving
+                      ? null
+                      : () async {
+                          final ok = await notifier.save();
+                          if (!mounted) return;
+                          if (ok) {
+                            _amountController.clear();
+                            _noteController.clear();
+                            _amountFocus.requestFocus(); // 连续记账停留在记账页
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('已记下，继续下一笔')),
+                            );
+                          } else if (state.error == null) {
+                            // 防御：理论不会出现，避免"静默失败"再次发生。
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('保存未完成，请检查输入')),
+                            );
+                          }
+                        },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceS),
+                    child: state.isSaving
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('记一笔', style: TextStyle(fontSize: 18)),
                   ),
                 ),
               ),
@@ -290,7 +305,7 @@ class _EntryPageState extends ConsumerState<EntryPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceM),
       child: DropdownButtonFormField<String>(
-        value: state.paymentMethod,
+        initialValue: state.paymentMethod,
         decoration: const InputDecoration(
           labelText: '支付方式',
           prefixIcon: Icon(Icons.payment_outlined),

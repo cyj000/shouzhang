@@ -27,6 +27,7 @@ class EntryFormState {
     this.lastSaveMs,
     this.sessionStartMs,
     this.lastSavedEntryId,
+    this.isSaving = false,
   });
 
   final String expression;
@@ -41,6 +42,9 @@ class EntryFormState {
   final int? sessionStartMs;
   final String? lastSavedEntryId;
 
+  /// BUGFIX: 保存中标志，防止连点重复写库（第 3.3 节根因1）。
+  final bool isSaving;
+
   EntryFormState copyWith({
     String? expression,
     String? type,
@@ -54,6 +58,7 @@ class EntryFormState {
     int? lastSaveMs,
     int? sessionStartMs,
     String? lastSavedEntryId,
+    bool? isSaving,
   }) =>
       EntryFormState(
         expression: expression ?? this.expression,
@@ -67,6 +72,7 @@ class EntryFormState {
         lastSaveMs: lastSaveMs ?? this.lastSaveMs,
         sessionStartMs: sessionStartMs ?? this.sessionStartMs,
         lastSavedEntryId: lastSavedEntryId ?? this.lastSavedEntryId,
+        isSaving: isSaving ?? this.isSaving,
       );
 
   int? previewCents() {
@@ -180,109 +186,130 @@ class EntryController extends Notifier<EntryFormState> {
   }
 
   /// FR-06：先落盘后反馈；失败保留表单；停留记账页连续录入。
+  /// BUGFIX：加事务 + 异常捕获 + 防连点锁，修复"数据保存不成功"。
   Future<bool> save() async {
+    // 防连点：正在保存时直接拒绝第二次点击（第 3.3 节根因1）。
+    if (state.isSaving) return false;
+
     final parsed = const AmountParser().parse(state.expression);
     if (!parsed.isSuccess) {
       state = state.copyWith(error: _errorText(parsed.status));
       return false;
     }
 
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final repos = await ref.read(appRepositoriesProvider.future);
-    final telemetry = ref.read(localTelemetryProvider);
-    final entryId = const Uuid().v4();
+    // 进入保存态：锁按钮 + 清旧错误。
+    state = state.copyWith(isSaving: true, clearError: true);
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final repos = await ref.read(appRepositoriesProvider.future);
+      final telemetry = ref.read(localTelemetryProvider);
+      final entryId = const Uuid().v4();
 
-    final entry = EntryRow(
-      id: entryId,
-      type: state.type,
-      amountCents: parsed.cents,
-      note: state.note.trim().isEmpty ? null : state.note.trim(),
-      occurredAt: now,
-      paymentMethod: state.paymentMethod,
-      createdAt: now,
-      updatedAt: now,
-    );
+      final entry = EntryRow(
+        id: entryId,
+        type: state.type,
+        amountCents: parsed.cents,
+        note: state.note.trim().isEmpty ? null : state.note.trim(),
+        occurredAt: now,
+        paymentMethod: state.paymentMethod,
+        createdAt: now,
+        updatedAt: now,
+      );
 
-    await repos.entries.save(entry);
+      // 一次保存的全部写操作放进同一事务：任何一步失败整体回滚，
+      // 杜绝"账目写了但标签/埋点没写"的半截数据（第 3.3 节根因3）。
+      await repos.db.transaction(() async {
+        await repos.entries.save(entry);
 
-    // 分类建议落库 + 明细埋点（kept 以保存时刻最终状态为准；删后加回仍算保留）。
-    var keptCount = 0;
-    for (final suggestion in state.suggestions) {
-      final isUnclassified =
-          suggestion.tagName == SystemTags.unclassifiedName;
-      final kept = state.selectedTagNames.contains(suggestion.tagName) ||
-          (isUnclassified && state.suggestions.length == 1);
-      if (kept) {
-        final tagId = await repos.tags.ensureTag(
-          suggestion.tagName,
-          type: suggestion.source == TagSources.text ? '品类' : null,
+        // 分类建议落库 + 明细埋点（kept 以保存时刻最终状态为准；删后加回仍算保留）。
+        var keptCount = 0;
+        for (final suggestion in state.suggestions) {
+          final isUnclassified =
+              suggestion.tagName == SystemTags.unclassifiedName;
+          final kept = state.selectedTagNames.contains(suggestion.tagName) ||
+              (isUnclassified && state.suggestions.length == 1);
+          if (kept) {
+            final tagId = await repos.tags.ensureTag(
+              suggestion.tagName,
+              type: suggestion.source == TagSources.text ? '品类' : null,
+            );
+            await repos.tags.addEntryTag(
+              EntryTagRow(
+                entryId: entryId,
+                tagId: tagId,
+                source: suggestion.source,
+                confidence: suggestion.confidence,
+              ),
+            );
+            keptCount++;
+          }
+          await telemetry.track(
+            TelemetryEventNames.classifyTagResult,
+            TelemetryEvents.classifyTagResult(
+              entryId: entryId,
+              tagName: suggestion.tagName,
+              source: suggestion.source,
+              confidence: suggestion.confidence,
+              kept: kept,
+            ),
+          );
+        }
+
+        final isContinuous = state.entryIndex > 0;
+        final durationMs =
+            now - (state.lastSaveMs ?? state.sessionStartMs ?? now);
+        final hit = state.suggestions.any(
+          (s) => s.tagName != SystemTags.unclassifiedName,
         );
-        await repos.tags.addTagToEntry(
-          EntryTagRow(
-            entryId: entryId,
-            tagId: tagId,
-            source: suggestion.source,
-            confidence: suggestion.confidence,
+
+        await telemetry.track(
+          TelemetryEventNames.recordSave,
+          TelemetryEvents.recordSave(
+            ts: now,
+            amountCents: parsed.cents,
+            tagCount: keptCount,
+            durationMs: durationMs,
+            offline: true, // 一期纯本地，无网络出口（R1）
+            entryIndex: state.entryIndex,
+            isContinuous: isContinuous,
           ),
         );
-        keptCount++;
-      }
-      await telemetry.track(
-        TelemetryEventNames.classifyTagResult,
-        TelemetryEvents.classifyTagResult(
-          entryId: entryId,
-          tagName: suggestion.tagName,
-          source: suggestion.source,
-          confidence: suggestion.confidence,
-          kept: kept,
-        ),
+        await telemetry.track(
+          TelemetryEventNames.classifyResult,
+          TelemetryEvents.classifyResult(
+            ts: now,
+            entryId: entryId,
+            tagCount: keptCount,
+            hit: hit,
+          ),
+        );
+      }); // end transaction —— 事务提交成功才算落盘
+
+      final prefs = await ref.read(sharedPreferencesProvider.future);
+      await prefs.setString(_lastPaymentKey, state.paymentMethod ?? '现金');
+
+      // 先落盘后反馈：事务成功后才清空表单并给连续记账反馈（FR-06）。
+      state = state.copyWith(
+        expression: '',
+        note: '',
+        suggestions: const <TagSuggestion>[],
+        selectedTagNames: const <String>{},
+        entryIndex: state.entryIndex + 1,
+        lastSaveMs: now,
+        lastSavedEntryId: entryId,
+        isSaving: false,
+        clearError: true,
       );
+      return true;
+    } catch (e) {
+      // FR-06 异常路径：失败保留表单（expression/note 未清），
+      // 给出可读错误提示，解锁按钮允许重试（文档 E1）。
+      state = state.copyWith(
+        isSaving: false,
+        error: '保存失败：${e.toString()}。内容已保留，请重试。',
+      );
+      return false;
     }
-
-    final isContinuous = state.entryIndex > 0;
-    final durationMs =
-        now - (state.lastSaveMs ?? state.sessionStartMs ?? now);
-    final hit = state.suggestions.any(
-      (s) => s.tagName != SystemTags.unclassifiedName,
-    );
-
-    await telemetry.track(
-      TelemetryEventNames.recordSave,
-      TelemetryEvents.recordSave(
-        ts: now,
-        amountCents: parsed.cents,
-        tagCount: keptCount,
-        durationMs: durationMs,
-        offline: true, // 一期纯本地，无网络出口（R1）
-        entryIndex: state.entryIndex,
-        isContinuous: isContinuous,
-      ),
-    );
-    await telemetry.track(
-      TelemetryEventNames.classifyResult,
-      TelemetryEvents.classifyResult(
-        ts: now,
-        entryId: entryId,
-        tagCount: keptCount,
-        hit: hit,
-      ),
-    );
-
-    final prefs = await ref.read(sharedPreferencesProvider.future);
-    await prefs.setString(_lastPaymentKey, state.paymentMethod ?? '现金');
-
-    // 连续记账：只清空本笔字段，停留记账页（FR-06）。
-    state = state.copyWith(
-      expression: '',
-      note: '',
-      suggestions: const <TagSuggestion>[],
-      selectedTagNames: const <String>{},
-      entryIndex: state.entryIndex + 1,
-      lastSaveMs: now,
-      lastSavedEntryId: entryId,
-      clearError: true,
-    );
-    return true;
   }
 
   String _errorText(AmountParseStatus status) {
