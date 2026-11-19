@@ -16,6 +16,8 @@ dependencies:
   # 本项目直接用 drift/native.dart + sqlcipher_flutter_libs 打开加密库。
   drift: ^2.22.0
   sqlcipher_flutter_libs: ^0.6.8
+  # 直接依赖：需要在 openEncrypted 中调用 open.overrideFor 把 sqlite3 指向 libsqlcipher.so
+  sqlite3: ^2.9.4
   path_provider: ^2.1.4
   path: ^1.9.0
 

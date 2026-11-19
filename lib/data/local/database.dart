@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/open.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 
 import '../../domain/entities/constants.dart';
@@ -38,6 +39,11 @@ class AppDatabase extends GeneratedDatabase {
   /// 生产打开：passphrase 由 KeystoreService 解出，不明文落文件。
   static AppDatabase openEncrypted(String passphrase) {
     final executor = LazyDatabase(() async {
+      // 关键：sqlite3 默认按 libsqlite3.so 加载，但 sqlcipher_flutter_libs 只提供
+      // libsqlcipher.so。必须先 override，否则真机报 "libsqlite3.so not found"，
+      // 数据库整体打不开 → 所有保存失败（BUG at 2026-11-19）。
+      open.overrideFor(OperatingSystem.android, openCipherOnAndroid);
+      // Android 6 上 Java 侧预加载更可靠；其他平台内部会直接返回，无副作用。
       await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
       final dir = await getApplicationDocumentsDirectory();
       final file = File(p.join(dir.path, 'paper_ledger.sqlite'));
@@ -46,6 +52,14 @@ class AppDatabase extends GeneratedDatabase {
         setup: (raw) {
           // PRAGMA key 必须在任何读写前设置；passphrase 为 base64url，无注入风险。
           raw.execute("PRAGMA key = '$passphrase'");
+          // 校验确实加载的是 SQLCipher 而非普通 sqlite3：
+          // 否则 key 会被静默忽略，库以明文打开（README 强烈建议的防护）。
+          final cipherVersion = raw.select('PRAGMA cipher_version;');
+          if (cipherVersion.length == 0) {
+            throw StateError(
+              'SQLCipher 不可用：libsqlcipher.so 未正确加载，拒绝以明文打开数据库',
+            );
+          }
         },
       );
     });
